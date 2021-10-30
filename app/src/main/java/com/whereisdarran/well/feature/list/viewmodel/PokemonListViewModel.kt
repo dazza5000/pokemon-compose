@@ -2,8 +2,9 @@ package com.whereisdarran.well.feature.list.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.whereisdarran.well.data.PokemonRepositoryImpl
+import com.whereisdarran.well.data.Result
 import com.whereisdarran.well.model.Pokemon
-import com.whereisdarran.well.network.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,29 +12,16 @@ import kotlinx.coroutines.launch
 
 class PokemonListViewModel : ViewModel() {
 
-    private val _pokemon: MutableStateFlow<PokemonStateFlow> =
-        MutableStateFlow(PokemonStateFlow.Success(emptyList()))
-    val pokemon: StateFlow<PokemonStateFlow> = _pokemon
+    private val _pokemons: MutableStateFlow<Result<List<Pokemon>>> =
+        MutableStateFlow(Result.Success(emptyList()))
+    val pokemons: StateFlow<Result<List<Pokemon>>>
+        get() = _pokemons
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val pokemonResponse = Network.pokemonService.getPokemon()
-
-            if (pokemonResponse.isSuccessful) {
-                _pokemon.value = PokemonStateFlow.Success(pokemonResponse.body()!!)
-            } else {
-                _pokemon.value = PokemonStateFlow.Error(
-                    Throwable(
-                        pokemonResponse.errorBody()
-                            ?.string()
-                    )
-                )
-            }
+            _pokemons.value = PokemonRepositoryImpl.getRepository().getPokemons()
         }
     }
 }
 
-sealed class PokemonStateFlow {
-    data class Success(val pokemonList: List<Pokemon>) : PokemonStateFlow()
-    data class Error(val exception: Throwable) : PokemonStateFlow()
-}
+

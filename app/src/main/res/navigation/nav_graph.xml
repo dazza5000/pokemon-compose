@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/pokemon_list_fragment_destination"
-        android:name="com.whereisdarran.well.feature.list.ui.PokemonListFragment"
+        android:name="com.whereisdarran.well.feature.list.ui.PokemonList"
         android:label="@string/app_name"
         >
         <action
